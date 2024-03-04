@@ -19,4 +19,7 @@ Interaction with OpenAI LLMs
 
 ## Packaging
 
-Follow instructions from the [Briefcase Packaging Tutorial](https://docs.beeware.org/en/latest/tutorial/tutorial-3.html).
+* Windows: Follow instructions from the [Briefcase Packaging Tutorial](https://docs.beeware.org/en/latest/tutorial/tutorial-3.html).
+
+* Android: Follow instructions from the [Briefcase Taking it Mobile Android
+  Tutorial](https://docs.beeware.org/en/latest/tutorial/tutorial-5/android.html)
