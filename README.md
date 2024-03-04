@@ -16,3 +16,7 @@ Interaction with OpenAI LLMs
    ```shell
    pip install toga briefcase
    ```
+
+## Packaging
+
+Follow instructions from the [Briefcase Packaging Tutorial](https://docs.beeware.org/en/latest/tutorial/tutorial-3.html).
