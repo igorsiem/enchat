@@ -14,13 +14,12 @@ class EnChat(toga.App):
         """
 
         self.main_window = toga.MainWindow()
-
         self.main_window.show()
 
         return super().startup()
     
 def main():
-    return EnChat("enChat", "com.technopraxia.enchat")
+    return EnChat("enChat", "com.technopraxia.enchat", description="Interaction with OpenAI LLMs")
 
 if __name__ == "__main__":
     main().main_loop()
