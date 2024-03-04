@@ -14,5 +14,5 @@ Interaction with OpenAI LLMs
 2. Install toga
 
    ```shell
-   pip install toga
+   pip install toga briefcase
    ```

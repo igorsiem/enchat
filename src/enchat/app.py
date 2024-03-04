@@ -20,6 +20,3 @@ class EnChat(toga.App):
     
 def main():
     return EnChat("enChat", "com.technopraxia.enchat", description="Interaction with OpenAI LLMs")
-
-if __name__ == "__main__":
-    main().main_loop()
