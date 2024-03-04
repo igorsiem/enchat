@@ -1,22 +1,70 @@
 import toga
+from toga.style.pack import COLUMN, ROW, Pack
 
 class EnChat(toga.App):
     """The main application class
     
     Attributes:
         main_window (toga.MainWindow): The main window of the application
+        chat_sc (toga.ScrollContainer): The scroll container for the chat entries
+        next_user_message_ti (toga.TextInput): The edit box for the next user input
+        self.next_user_message_bn (toga.Button): The button for sending the next user message
     """
 
-    def startup(self) -> None:
-        """Build the GUI elements of the application, in including the main winddow
+    def startup(self):
+        """Build the GUI elements of the application, including the main winddow
 
         This method is called to start the application.
         """
 
-        self.main_window = toga.MainWindow()
+        self.build_main_window()
         self.main_window.show()
+    
+    def build_main_window(self):
+        """Build the main window of the application
+        
+        Creates the `self.main_window` attribute, and all its child objects.
+        """
+        self.main_window = toga.MainWindow()
+        self.main_window.content = self.create_main_box()
 
-        return super().startup()
+    def create_main_box(self) -> toga.Box:
+        """Create the main content box for the application
+
+        This method creates the `self.chat_sc`, `self.next_user_message_ti`, and `self.next_user_message_bn` attributes.
+
+        Returns:
+            toga.Box: The main content box object
+        """
+
+        self.chat_sc = toga.ScrollContainer(horizontal=False)
+        self.chat_sc.style.flex = 1
+
+        self.next_user_message_ti = toga.MultilineTextInput()
+        self.next_user_message_ti.style.flex = 1
+        self.next_user_message_bn = toga.Button(text=">", on_press=self.send_next_user_message)
+
+        next_user_message_box = toga.Box(style=Pack(direction=ROW), children=[self.next_user_message_ti, self.next_user_message_bn])
+
+        main_box = toga.Box(style=Pack(direction=COLUMN), children=[self.chat_sc, next_user_message_box])
+
+        return main_box
+    
+    def send_next_user_message(self, widget):
+        """This method is invoked by the `self.send_next_user_message_cd` command object.
+
+        TODO This is just a placeholder right now - it needs to be implemented
+
+
+        Args:
+            widget: The widget object that invoked the action.
+        """
+        print("Send Next User Message action invoked")
     
 def main():
+    """_summary_
+
+    Returns:
+        _type_: _description_
+    """
     return EnChat("enChat", "com.technopraxia.enchat", description="Interaction with OpenAI LLMs")
