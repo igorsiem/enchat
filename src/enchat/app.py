@@ -26,7 +26,18 @@ class EnChat(toga.App):
         
         Creates the `self.main_window` attribute, and all its child objects.
         """
+
+        configure_chat_cd = toga.Command(
+            self.configure_chat,
+            text="Configure Chat",
+            tooltip="Set up the current chat",
+            order=1
+        )
+
+        self.commands.add(configure_chat_cd)
+
         self.main_window = toga.MainWindow()
+        self.main_window.toolbar.add(configure_chat_cd)
         self.main_window.content = self.create_main_box()
 
     def create_main_box(self) -> toga.Box:
@@ -73,6 +84,9 @@ class EnChat(toga.App):
             widget: The widget object that invoked the action.
         """
         self.chat_bx.add(MessageBox("user", self.next_user_message_ti.value))
+
+    def configure_chat(self, widget):
+        print("TODO implement configure_chat method")
     
 def main():
     """_summary_
