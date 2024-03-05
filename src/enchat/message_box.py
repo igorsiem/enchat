@@ -11,12 +11,36 @@ class MessageBox(Box):
     * "Assistant" - The message comes from the AI agent
     * "User" - The message comes from the human user
 
-    This class should not be confused with the "Message Box" for alerting users with a simple message that is an artefact of many GUIs.
+    Note:
+        This class should not be confused with the "Message Box" for alerting users with a simple message that is an artefact of many GUIs.
 
     Attributes:
         _role_lb: Label for the 'role' string
         _message_lb: Label for the message text
     """
+
+    COLOURS = {
+        'user': {
+            'role': {
+                'foreground': '#99f',
+                'background': '#111'
+            },
+            'message': {
+                'foreground': '#aaa',
+                'background': '#111'
+            }
+        },
+        "assistant": {
+            'role': {
+                'foreground': '#f99',
+                'background': '#333'
+            },
+            'message': {
+                'foreground': '#ddd',
+                'background': '#333'
+            }
+        }
+    }
 
     def __init__(self, role : str, message : str):
         """Set up the MessageBox object
@@ -26,8 +50,23 @@ class MessageBox(Box):
             message (str): The entire text of the message
         """
 
-        self._role_lb = Label(text=role)
-        self._message_lb = Label(text=message)
+        rl = 'user'
+
+        if role == "assistant":
+            rl = 'assistant'
+
+        self._role_lb = Label(
+            text=role,
+            style=Pack(
+                color=MessageBox.COLOURS[rl]['role']['foreground'],
+                background_color=MessageBox.COLOURS[rl]['role']['background']
+            ))
+        self._message_lb = Label(
+            text=message,
+            style=Pack(
+                flex=1,
+                color=MessageBox.COLOURS[rl]['message']['foreground'],
+                background_color=MessageBox.COLOURS[rl]['message']['background']))
 
         super(MessageBox, self).__init__(style=Pack(direction=ROW), children=[self._role_lb, self._message_lb])
 

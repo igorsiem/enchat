@@ -40,7 +40,7 @@ class EnChat(toga.App):
 
         # Create a Box for the chat messages.
         self.chat_bx = toga.Box(style=Pack(direction=COLUMN))
-        self.chat_bx.add(MessageBox("user", "hello, there"))
+        self.chat_bx.add(MessageBox("assistant", "Hello, there. What can I do for you today?"))
 
         # Create a scroll container for the chat messages box.
         chat_sc = toga.ScrollContainer(horizontal=False)
