@@ -1,18 +1,19 @@
 import toga
 from toga.style.pack import COLUMN, ROW, Pack
+from enchat.message_box import MessageBox
 
 class EnChat(toga.App):
     """The main application class
     
     Attributes:
         main_window (toga.MainWindow): The main window of the application
-        chat_sc (toga.ScrollContainer): The scroll container for the chat entries
-        next_user_message_ti (toga.TextInput): The edit box for the next user input
+        chat_bx (toga.Box): Box containing the chat messages
+        next_user_message_ti (toga.TextInput): The edit box for the next user message
         self.next_user_message_bn (toga.Button): The button for sending the next user message
     """
 
     def startup(self):
-        """Build the GUI elements of the application, including the main winddow
+        """Build the GUI elements of the application, including the main window
 
         This method is called to start the application.
         """
@@ -31,22 +32,29 @@ class EnChat(toga.App):
     def create_main_box(self) -> toga.Box:
         """Create the main content box for the application
 
-        This method creates the `self.chat_sc`, `self.next_user_message_ti`, and `self.next_user_message_bn` attributes.
+        This method builds the `self.chat_bx`, `self.next_user_message_ti`, and `self.next_user_message_bn` attributes.
 
         Returns:
             toga.Box: The main content box object
         """
 
-        self.chat_sc = toga.ScrollContainer(horizontal=False)
-        self.chat_sc.style.flex = 1
+        # Create a Box for the chat messages.
+        self.chat_bx = toga.Box(style=Pack(direction=COLUMN))
+        self.chat_bx.add(MessageBox("user", "hello, there"))
 
+        # Create a scroll container for the chat messages box.
+        chat_sc = toga.ScrollContainer(horizontal=False)
+        chat_sc.style.flex = 1
+        chat_sc.content = self.chat_bx
+
+        # Text input for the user
         self.next_user_message_ti = toga.MultilineTextInput()
         self.next_user_message_ti.style.flex = 1
         self.next_user_message_bn = toga.Button(text=">", on_press=self.send_next_user_message)
 
         next_user_message_box = toga.Box(style=Pack(direction=ROW), children=[self.next_user_message_ti, self.next_user_message_bn])
 
-        main_box = toga.Box(style=Pack(direction=COLUMN), children=[self.chat_sc, next_user_message_box])
+        main_box = toga.Box(style=Pack(direction=COLUMN), children=[chat_sc, next_user_message_box])
 
         return main_box
     
@@ -55,11 +63,10 @@ class EnChat(toga.App):
 
         TODO This is just a placeholder right now - it needs to be implemented
 
-
         Args:
             widget: The widget object that invoked the action.
         """
-        print("Send Next User Message action invoked")
+        self.chat_bx.add(MessageBox("user", self.next_user_message_ti.value))
     
 def main():
     """_summary_
