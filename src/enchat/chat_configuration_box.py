@@ -6,6 +6,8 @@ from enchat.validators import FloatRange, IntegerRange
 class ChatConfigurationBox(Box):
     """A box containing controls for configuring the current chat
 
+    These parameters are sent to the server.
+
     Attributes:
         _system_content_mti (MultiLineTextInput): Input for the system content at the beginning of the chat
         _temp_txi (TextInput): Input for the temperature attribute
@@ -20,7 +22,7 @@ class ChatConfigurationBox(Box):
     LABEL_WIDTH = 100
 
     def __init__(self, system_content : str, on_ok : (Widget), on_cancel : (Widget), temp : float = 0.8, n_predict : int = -1,
-                 top_k : int = 40, repeat_penalty : float = 1.1, min_p : float = 0.95, top_p : float = 0.95):
+                 top_k : int = 40, repeat_penalty : float = 1.1, min_p : float = 0.95, top_p : float = 0.95):        
         
         # System content
         system_content_lbl = Label("System content")

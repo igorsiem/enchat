@@ -64,7 +64,7 @@ class EnChat(toga.App):
                 system_content="This is where the system content goes",
                 on_ok=self.on_chat_configuration_ok,
                 on_cancel=self.on_chat_configuration_cancel)
-        self._system_configuration_box = SystemConfigurationBox("", on_ok=self.on_system_configuration_ok, 
+        self._system_configuration_box = SystemConfigurationBox("http://localhost:1234", on_ok=self.on_system_configuration_ok, 
                                                                on_cancel=self.on_system_configuration_cancel)
 
         # Set up the main window, initially containing the main content box        
