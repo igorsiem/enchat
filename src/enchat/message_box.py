@@ -15,8 +15,8 @@ class MessageBox(Box):
 
     Attributes:
         COLORS (lst[dict]): Data structure holding style and colour combinations
-        _role_lb (toga.Label): Label for the 'role' string
-        _message_lb (toga.Label): Label for the message text
+        _role_lbl (toga.Label): Label for the 'role' string
+        _message_lbl (toga.Label): Label for the message text
     """
 
     COLOURS = {
@@ -59,7 +59,7 @@ class MessageBox(Box):
         if role == "assistant":
             rl = 'assistant'
 
-        self._role_lb = Label(
+        self._role_lbl = Label(
             text=role,
             style=Pack(
                 color=MessageBox.COLOURS[rl]['role']['foreground'],
@@ -67,7 +67,7 @@ class MessageBox(Box):
                 font_size=MessageBox.FONT_SIZE,
                 width=MessageBox.ROLE_WIDTH
             ))
-        self._message_lb = Label(
+        self._message_lbl = Label(
             text=message,
             style=Pack(
                 flex=1,
@@ -76,7 +76,7 @@ class MessageBox(Box):
                 font_size=MessageBox.FONT_SIZE
             ))
 
-        super(MessageBox, self).__init__(style=Pack(direction=ROW), children=[self._role_lb, self._message_lb])
+        super(MessageBox, self).__init__(style=Pack(direction=ROW), children=[self._role_lbl, self._message_lbl])
 
     @property
     def role(self) -> str:
@@ -85,11 +85,11 @@ class MessageBox(Box):
         Returns:
             str: The role as a human-readable string
         """
-        return self._role_lb.text
+        return self._role_lbl.text
     
     @role.setter
     def role(self, value : str):
-        self._role_lb.text = value
+        self._role_lbl.text = value
 
     @property
     def message(self) -> str:
@@ -98,8 +98,8 @@ class MessageBox(Box):
         Returns:
             str: The text of the message
         """
-        return self._message_lb.text
+        return self._message_lbl.text
     
     @message.setter
     def message(self, value : str):
-        self._message_lb.text = value
+        self._message_lbl.text = value
