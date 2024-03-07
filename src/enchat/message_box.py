@@ -1,4 +1,3 @@
-import toga
 from toga import Box, Label
 from toga.style.pack import ROW, Pack
 
@@ -15,8 +14,9 @@ class MessageBox(Box):
         This class should not be confused with the "Message Box" for alerting users with a simple message that is an artefact of many GUIs.
 
     Attributes:
-        _role_lb: Label for the 'role' string
-        _message_lb: Label for the message text
+        COLORS (lst[dict]): Data structure holding style and colour combinations
+        _role_lb (toga.Label): Label for the 'role' string
+        _message_lb (toga.Label): Label for the message text
     """
 
     COLOURS = {
@@ -42,6 +42,10 @@ class MessageBox(Box):
         }
     }
 
+    FONT_SIZE = 12
+
+    ROLE_WIDTH = 100
+
     def __init__(self, role : str, message : str):
         """Set up the MessageBox object
 
@@ -59,14 +63,18 @@ class MessageBox(Box):
             text=role,
             style=Pack(
                 color=MessageBox.COLOURS[rl]['role']['foreground'],
-                background_color=MessageBox.COLOURS[rl]['role']['background']
+                background_color=MessageBox.COLOURS[rl]['role']['background'],
+                font_size=MessageBox.FONT_SIZE,
+                width=MessageBox.ROLE_WIDTH
             ))
         self._message_lb = Label(
             text=message,
             style=Pack(
                 flex=1,
                 color=MessageBox.COLOURS[rl]['message']['foreground'],
-                background_color=MessageBox.COLOURS[rl]['message']['background']))
+                background_color=MessageBox.COLOURS[rl]['message']['background'],
+                font_size=MessageBox.FONT_SIZE
+            ))
 
         super(MessageBox, self).__init__(style=Pack(direction=ROW), children=[self._role_lb, self._message_lb])
 
