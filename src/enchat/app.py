@@ -1,8 +1,11 @@
+import logging
 import toga
 from toga.style.pack import COLUMN, ROW, Pack
 from enchat.message_box import MessageBox
 from enchat.chat_configuration_box import ChatConfigurationBox
 from enchat.system_configuration_box import SystemConfigurationBox
+
+logging.basicConfig(level=logging.DEBUG)
 
 class EnChat(toga.App):
     """The main application class
@@ -115,7 +118,7 @@ class EnChat(toga.App):
             widget: The widget object that invoked the action.
         """
         self._chat_box.add(MessageBox("user", self._next_user_message_mti.value))
-        print("TODO Implement send next user message")
+        logging.debug("TODO Implement send next user message")
 
     def configure_chat(self, widget):
         """Display the Chat Configuration window for displaying the chat parameters.
@@ -126,7 +129,7 @@ class EnChat(toga.App):
             widget (toga.Widget): The widget that invoked the method
         """
         self.switch_to_chat_configuration()
-        print("TODO Implement chat configuration initialisation")
+        logging.debug("TODO Implement chat configuration initialisation")
 
     def on_chat_configuration_ok(self, widget):
         """Update the configuration for the chat and hide the Chat Configuration window.
@@ -139,7 +142,7 @@ class EnChat(toga.App):
             widget (Widget): The widget that invoked this method
         """
         self.switch_to_main_content()
-        print("TODO Implement chat configuration")
+        logging.debug("TODO Implement chat configuration")
 
     def on_chat_configuration_cancel(self, widget):
         """Close the Chat Configuration window without updating any chat parameters.
@@ -150,19 +153,19 @@ class EnChat(toga.App):
             widget (Widget): The widget that invoked this method
         """
         self.switch_to_main_content()        
-        print("TODO implement chat config cancel")
+        logging.debug("TODO implement chat config cancel")
 
     def configure_system(self, widget):
         self.switch_to_system_configuration()
-        print("TODO implement system config initialisation")
+        logging.debug("TODO implement system config initialisation")
 
     def on_system_configuration_ok(self, widget):
         self.switch_to_main_content()
-        print("TODO implement system config confirmation")
+        logging.debug("TODO implement system config confirmation")
 
     def on_system_configuration_cancel(self, widget):
         self.switch_to_main_content()
-        print("TODO implement system config cancellation")
+        logging.debug("TODO implement system config cancellation")
 
     def switch_to_main_content(self):
         self.main_window.content = self._main_content_box
