@@ -17,6 +17,10 @@ Interaction with OpenAI LLMs
    pip install toga briefcase
    ```
 
+## Additional Config
+
+* It may be necessary to set the `BRIEFCASE_HOME` environment variable if the default briefcase home path includes spaces.
+
 ## Packaging
 
 * Windows: Follow instructions from the [Briefcase Packaging Tutorial](https://docs.beeware.org/en/latest/tutorial/tutorial-3.html).

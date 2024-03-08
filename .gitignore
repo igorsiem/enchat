@@ -63,3 +63,6 @@ logs/
 
 # Venv
 venv/
+
+# Local caching for when we need it
+cache/
