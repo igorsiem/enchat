@@ -4,6 +4,7 @@ from toga.style.pack import COLUMN, ROW, Pack
 from enchat.message_box import MessageBox
 from enchat.chat_configuration_box import ChatConfigurationBox
 from enchat.system_configuration_box import SystemConfigurationBox
+from enchat.system_configuration import SystemConfiguration
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -33,6 +34,9 @@ class EnChat(toga.App):
 
         This method is called to start the application.
         """
+
+        logging.debug(f"config path: {self.paths.config}")
+        logging.debug(f"data path: {self.paths.data}")
 
         self.build_main_window()
         self.main_window.show()
@@ -67,8 +71,9 @@ class EnChat(toga.App):
                 system_content="This is where the system content goes",
                 on_ok=self.on_chat_configuration_ok,
                 on_cancel=self.on_chat_configuration_cancel)
-        self._system_configuration_box = SystemConfigurationBox("http://localhost:1234", on_ok=self.on_system_configuration_ok, 
-                                                               on_cancel=self.on_system_configuration_cancel)
+        self._system_configuration_box = SystemConfigurationBox(SystemConfiguration("http://localhost:1234"),
+                                                                on_ok=self.on_system_configuration_ok,
+                                                                on_cancel=self.on_system_configuration_cancel)
 
         # Set up the main window, initially containing the main content box        
         self.main_window = toga.MainWindow()
@@ -155,31 +160,54 @@ class EnChat(toga.App):
         self.switch_to_main_content()        
         logging.debug("TODO implement chat config cancel")
 
-    def configure_system(self, widget):
+    def configure_system(self, widget : toga.Widget):
+        """Allow the user to configure the system by switching to the system configuration UI        
+
+        Args:
+            widget (toga.Widget): The control that invoked the action
+        """
         self.switch_to_system_configuration()
         logging.debug("TODO implement system config initialisation")
 
-    def on_system_configuration_ok(self, widget):
+    def on_system_configuration_ok(self, widget : toga.Widget):
+        """Confirm system configuration, switching to the main content UI
+
+        Args:
+            widget (toga.Widget): The widget that invoked the action
+        """
         self.switch_to_main_content()
         logging.debug("TODO implement system config confirmation")
 
-    def on_system_configuration_cancel(self, widget):
+    def on_system_configuration_cancel(self, widget : toga.Widget):
+        """Confirm cancellation of editing of the system config, switching to the main UI
+
+        Args:
+            widget (toga.Widget): The widget that invoked the action
+        """
         self.switch_to_main_content()
+        logging.debug(f"config cancelled - address is: {self._system_configuration_box.system_configuration.server_address}")
         logging.debug("TODO implement system config cancellation")
 
     def switch_to_main_content(self):
+        """Switch the UI to the main content
+        """
         self.main_window.content = self._main_content_box
         self._configure_chat_cmd.enabled = True
         self._configure_system_cmd.enabled = True
 
     def switch_to_chat_configuration(self):
+        """Switch the UI to the chat configuration
+        """
         self.main_window.content = self._chat_configuration_box
         self._configure_chat_cmd.enabled = False
         self._configure_system_cmd.enabled = False
 
     def switch_to_system_configuration(self):
+        """Switch the UI to the system configuration
+        """
+        self._system_configuration_box.load()
         self.main_window.content = self._system_configuration_box
-        self._configure_chat_cmd.enabled = True
+        self._configure_chat_cmd.enabled = False
         self._configure_system_cmd.enabled = False
 
 def main():

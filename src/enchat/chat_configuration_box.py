@@ -43,6 +43,7 @@ class ChatConfigurationBox(Box):
                         FloatRange("must be in the range [0,1]", allow_empty=False, min=0.0, max=1.0)])
         temp_box = Box(children=[temp_lbl, self._temp_txi])
         temp_box.style.direction=ROW
+        temp_box.style.alignment="center"
 
         # n_predict
         n_predict_lbl = Label("n_predict")
@@ -54,6 +55,7 @@ class ChatConfigurationBox(Box):
                         IntegerRange(error_message="must be an integer greater than -1", allow_empty=False, min=-1)])
         n_predict_box = Box(children=[n_predict_lbl, self._n_predict_txi])
         n_predict_box.style.direction=ROW
+        n_predict_box.style.alignment="center"
 
         # top_k
         top_k_lbl = Label("top_k")
@@ -65,6 +67,7 @@ class ChatConfigurationBox(Box):
                         IntegerRange(error_message="must be an integer greater than 0", allow_empty=False, min=0)])
         top_k_box = Box(children=[top_k_lbl, self._top_k_txi])
         top_k_box.style.direction=ROW
+        top_k_box.style.alignment="center"
 
         # Repeat penalty
         repeat_penalty_lbl = Label("Repeat penalty")
@@ -77,6 +80,7 @@ class ChatConfigurationBox(Box):
         
         repeat_penalty_box = Box(children=[repeat_penalty_lbl, self._repeat_penalty_txi])
         repeat_penalty_box.style.direction = ROW
+        repeat_penalty_box.style.alignment="center"
 
         # min_p
         min_p_lbl = Label("min_p")
@@ -89,6 +93,7 @@ class ChatConfigurationBox(Box):
         
         min_p_bx = Box(children=[min_p_lbl, self._min_p_txi])
         min_p_bx.style.direction=ROW
+        min_p_bx.style.alignment="center"
 
         # top_p
         top_p_lbl = Label("top_p")
@@ -101,6 +106,7 @@ class ChatConfigurationBox(Box):
         
         top_p_box = Box(children=[top_p_lbl, self._top_p_txi])
         top_p_box.style.direction = ROW
+        top_p_box.style.alignment="center"
 
         # OK and cancel buttons
         ok_btn = Button(text="OK", on_press=on_ok)

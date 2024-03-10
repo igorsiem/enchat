@@ -1,45 +1,39 @@
 from toga import Box, Label, TextInput, Widget, Button
-from toga.validators import BooleanValidator
 from toga.style.pack import COLUMN, ROW
-from urllib.parse import urlparse
+from enchat.system_configuration import SystemConfiguration
+import logging
 
 class SystemConfigurationBox(Box):
-    """A box containing control for configuring the system
+    """A box containing UI controls for configuring the system
 
     Attributes:
         self._server_address_txi (TextInput): Text Input control for editing the server address
+        self._external_on_ok (Callable or None): An external function to call when the `OK` button is pressed
     """
+    
+    def __init__(self, system_configuration : SystemConfiguration, on_ok : (Widget), on_cancel : (Widget)):
+        """Initialise the UI
 
-    class ServerAddressValidator(BooleanValidator):
-        """Validator for the server address
-
-        This validator checks that the given scheme is http or https.
-
-        TODO Tests for this validator
+        Args:
+            system_configuration (SystemConfiguration): The System Configuration object to manage
+            on_ok (Callable): External function to call when OK button is pressed
+            on_cancel (Callable): External function to call when Cancel button is pressed
         """
 
-        def is_valid(self, input_string : str) -> bool:            
-            result = urlparse(input_string, scheme='http')
+        self._system_configuration = system_configuration
+        self._external_on_ok = on_ok
 
-            if result.scheme not in ['http', 'https']:
-                print(f"*** scheme: {result.scheme}")
-                return False
-            
-            return True
-
-    
-    def __init__(self, server_address : str, on_ok : (Widget), on_cancel : (Widget)):
         server_address_lb = Label("Server address")
-        self._server_address_txi = TextInput(value=server_address,
-                                             validators=[SystemConfigurationBox.ServerAddressValidator(
-                                                 error_message="must be a valid http(s) URL")])
+        self._server_address_txi = TextInput(validators=[SystemConfiguration.ServerAddressValidator(
+                                                 error_message=SystemConfiguration.ServerAddressValidator.ERROR_MESSAGE)])
         self._server_address_txi.style.width = 200
 
         server_address_bx = Box(children=[server_address_lb, self._server_address_txi])
         server_address_bx.style.direction = ROW
+        server_address_bx.style.alignment = "center"
 
         # OK and cancel buttons
-        ok_btn = Button(text="OK", on_press=on_ok)
+        ok_btn = Button(text="OK", on_press=self.on_ok)
         cancel_btn = Button(text="Cancel", on_press=on_cancel)
         button_bx = Box(children=[ok_btn, cancel_btn])
         button_bx.style.direction=(ROW)
@@ -47,15 +41,36 @@ class SystemConfigurationBox(Box):
         super(SystemConfigurationBox, self).__init__(children=[server_address_bx, button_bx])
         self.style.direction=COLUMN
 
-    @property
-    def server_address(self) -> str:
-        """The address of the server, including optional port number
+    def on_ok(self, widget : Widget):
+        """Update the managed System Configuration object when OK is pressed
 
-        Returns:
-            str: The server address
+        Note that the `self._external_on_ok` function (passed to the `__init__` method is called after the update).
+
+        Args:
+            widget (Widget): The widget that triggered the call
         """
-        return self._server_address_txi.value
+        self.store()
+
+        if self._external_on_ok is not None:
+            self._external_on_ok(widget)
+
+    def load(self):
+        """Load the UI controls from the server config object
+        """
+        logging.debug(f"SystemConfigurationBox.load called - server address: {self.system_configuration.server_address}")
+        self._server_address_txi.value = self.system_configuration.server_address
+
+    def store(self):
+        """Store the information from the UI controls into the server config object
+        """
+        self.system_configuration.server_address = self._server_address_txi.value
+
+    @property
+    def system_configuration(self) -> SystemConfiguration:
+        """The system configuration object being managed by this UI box
+        """
+        return self._system_configuration
     
-    @server_address.setter
-    def server_address(self, value : str):
-        self._server_address_txi.value = value
+    @system_configuration.setter
+    def system_configuration(self, value : SystemConfiguration):
+        self._system_configuration = value
