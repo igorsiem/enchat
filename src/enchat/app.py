@@ -71,7 +71,7 @@ class EnChat(toga.App):
                 system_content="This is where the system content goes",
                 on_ok=self.on_chat_configuration_ok,
                 on_cancel=self.on_chat_configuration_cancel)
-        self._system_configuration_box = SystemConfigurationBox(SystemConfiguration("http://localhost:1234"),
+        self._system_configuration_box = SystemConfigurationBox(SystemConfiguration(self.paths.config),
                                                                 on_ok=self.on_system_configuration_ok,
                                                                 on_cancel=self.on_system_configuration_cancel)
 
@@ -205,7 +205,7 @@ class EnChat(toga.App):
     def switch_to_system_configuration(self):
         """Switch the UI to the system configuration
         """
-        self._system_configuration_box.load()
+        self._system_configuration_box.load_ui_from_config()
         self.main_window.content = self._system_configuration_box
         self._configure_chat_cmd.enabled = False
         self._configure_system_cmd.enabled = False
