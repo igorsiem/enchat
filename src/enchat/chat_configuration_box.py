@@ -15,7 +15,7 @@ class ChatConfigurationBox(Box):
         _top_k_txi (TextInput): Input for the `top_k` parameter
         _repeat_penalty_txi (TextInput): Input for the repeat penality model parameter
         _min_p_txi (TextInput): Input for the min_p parameter for the model
-        _top_p_txi (TextInput): Inpyt for the top_p parameter for the model
+        _top_p_txi (TextInput): Input for the top_p parameter for the model
         LABEL_WIDTH (int): Consistent width for all labels in a column of parameters
     """
 

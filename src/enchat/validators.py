@@ -6,7 +6,7 @@ class FloatRange(BooleanValidator):
     This validator checks that the input is between a given range when converted to a floating point. It does *not* check that the input
     is numeric (use the `Number` validator).
 
-    TODO Tests for the FloatRnage validator class
+    TODO Tests for the FloatRange validator class
     """
 
     def __init__(self, error_message : str, allow_empty : bool = True, min : float = None, max : float = None):
@@ -61,3 +61,27 @@ class IntegerRange(BooleanValidator):
             return False
             
         return True
+
+def validate_using(value, *args):
+    """Validate a value against one or more BooleanValidator objects
+
+    Args:
+        value (_type_): The value to check
+        *args: One or more validator objects
+
+    Raises:
+        RuntimeError: _description_
+        RuntimeError: _description_
+
+    Returns:
+        _type_: _description_
+    """
+    validators = list(args)
+
+    if len(validators) < 1:
+        raise RuntimeError("the `validate_using` function needs at least one BooleanValidator")
+    
+    if any(isinstance(v, BooleanValidator) is False for v in validators):
+        raise RuntimeError("`validate_using` was called with one or more objects that are not BooleanValidator objects")
+    
+    return all(v.is_valid(value) for v in validators)

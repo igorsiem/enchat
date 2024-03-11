@@ -6,6 +6,11 @@ import logging
 
 class SystemConfiguration:
     """A data structure for holding system config information
+
+    Attributes:
+        CONFIG_FILE_NAME (String): The name of the configuration file (folder path is passed to __init__)
+        SERVER_ADDRESS_TAGNAME (String): Name of the tag used for the server address in the config dictionary
+        DEFAULT_SERVER_ADDRESS (String): Default server address to use when none is available from the config file
     """
 
     CONFIG_FILE_NAME = 'enchat_config.json'
