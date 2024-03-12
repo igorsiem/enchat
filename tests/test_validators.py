@@ -1,4 +1,4 @@
-from enchat.validators import FloatRange, IntegerRange, validate_all_using
+from enchat.validators import FloatRange, IntegerRange, validate_all_using, validate_any_using
 
 def test_float_range():
     # Simple range checks
@@ -71,3 +71,27 @@ def test_validate_all_using():
     assert validate_all_using(2, [v1, v2]) is True
     assert validate_all_using(3, [v1, v2]) is True        
     assert validate_all_using(4, [v1, v2]) is False        
+
+def test_validate_any_using():
+    v1 = IntegerRange(error_message="", min=1, max=3)
+    v2 = IntegerRange(error_message="", min=2, max=4)
+
+    assert validate_any_using(0, v1) is False
+    assert validate_any_using(1, v1) is True
+    assert validate_any_using(2, v1) is True    
+    assert validate_any_using(3, v1) is True    
+    assert validate_any_using(4, v1) is False
+
+    assert validate_any_using(0, v1, v2) is False
+    assert validate_any_using(1, v1, v2) is True    
+    assert validate_any_using(2, v1, v2) is True
+    assert validate_any_using(3, v1, v2) is True        
+    assert validate_any_using(4, v1, v2) is True    
+    assert validate_any_using(5, v1, v2) is False
+
+    assert validate_any_using(0, [v1, v2]) is False
+    assert validate_any_using(1, [v1, v2]) is True    
+    assert validate_any_using(2, [v1, v2]) is True
+    assert validate_any_using(3, [v1, v2]) is True        
+    assert validate_any_using(4, [v1, v2]) is True    
+    assert validate_any_using(5, [v1, v2]) is False

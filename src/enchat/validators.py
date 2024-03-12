@@ -59,16 +59,14 @@ class IntegerRange(BooleanValidator):
         return True
 
 def validate_all_using(value, *args):
-    """Validate a value against one or more BooleanValidator objects - validation must pass for *all* validators to be value
-
-    TODO Could do a corresponding 'validate_any_using' method
+    """Validate a value against one or more BooleanValidator objects - validation must pass for *all* validators to be valid
 
     Args:
         value (_type_): The value to check
         *args: One or more validator objects, either as arguments or a list
 
     Returns:
-        _type_: True if all validation passes
+        True if all validation passes
     """
     validators = list(args)
 
@@ -81,3 +79,25 @@ def validate_all_using(value, *args):
                 return False
 
     return True
+
+def validate_any_using(value, *args):
+    """Validate a value against one or more BooleanValidator objects - valid if any supplied validator passes
+
+    Args:
+        value (_type_): The value to check
+        *args: One or more validator objects, either as arguments or a list
+
+    Returns:
+        True if any validation passes
+    """
+    validators = list(args)
+
+    for v in validators:
+        if isinstance(v, list):
+            if any(the_v.is_valid(value) for the_v in v) is True:
+                return True
+        else:
+            if v.is_valid(value) is True:
+                return True
+
+    return False
