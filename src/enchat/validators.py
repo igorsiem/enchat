@@ -5,8 +5,6 @@ class FloatRange(BooleanValidator):
 
     This validator checks that the input is between a given range when converted to a floating point. It does *not* check that the input
     is numeric (use the `Number` validator).
-
-    TODO Tests for the FloatRange validator class
     """
 
     def __init__(self, error_message : str, allow_empty : bool = True, min : float = None, max : float = None):
@@ -34,8 +32,6 @@ class IntegerRange(BooleanValidator):
 
     This validator checks that the input is between a given range when converted to a floating point. It does *not* check that the input
     is numeric (use the `Number` validator), but it *does* check that - if a numeric - it's an integer.
-
-    TODO Tests for the IntegerRange validator class
     """
 
     def __init__(self, error_message : str, allow_empty : bool = True, min : int = None, max : int = None):
@@ -62,26 +58,26 @@ class IntegerRange(BooleanValidator):
             
         return True
 
-def validate_using(value, *args):
-    """Validate a value against one or more BooleanValidator objects
+def validate_all_using(value, *args):
+    """Validate a value against one or more BooleanValidator objects - validation must pass for *all* validators to be value
+
+    TODO Could do a corresponding 'validate_any_using' method
 
     Args:
         value (_type_): The value to check
-        *args: One or more validator objects
-
-    Raises:
-        RuntimeError: _description_
-        RuntimeError: _description_
+        *args: One or more validator objects, either as arguments or a list
 
     Returns:
-        _type_: _description_
+        _type_: True if all validation passes
     """
     validators = list(args)
 
-    if len(validators) < 1:
-        raise RuntimeError("the `validate_using` function needs at least one BooleanValidator")
-    
-    if any(isinstance(v, BooleanValidator) is False for v in validators):
-        raise RuntimeError("`validate_using` was called with one or more objects that are not BooleanValidator objects")
-    
-    return all(v.is_valid(value) for v in validators)
+    for v in validators:
+        if isinstance(v, list):
+            if all(the_v.is_valid(value) for the_v in v) is False:
+                return False
+        else:
+            if v.is_valid(value) is False:
+                return False
+
+    return True
