@@ -2,6 +2,7 @@ from toga import Box, Label, MultilineTextInput, TextInput, Widget, Button
 from toga.style.pack import COLUMN, ROW
 from toga.validators import Number
 from enchat.validators import FloatRange, IntegerRange
+from enchat.chat_configuration import ChatConfiguration
 
 class ChatConfigurationBox(Box):
     """A box containing controls for configuring the current chat
@@ -21,13 +22,34 @@ class ChatConfigurationBox(Box):
 
     LABEL_WIDTH = 100
 
-    def __init__(self, system_content : str, on_ok : (Widget), on_cancel : (Widget), temp : float = 0.8, n_predict : int = -1,
-                 top_k : int = 40, repeat_penalty : float = 1.1, min_p : float = 0.95, top_p : float = 0.95):        
+    def load_ui_from_config(self):
+        self._system_content_mti.value = self._chat_configuration.system_content
+        self._temp_txi.value = self._chat_configuration.temp
+        self._n_predict_txi.value = self._chat_configuration.n_predict
+        self._top_k_txi.value = self._chat_configuration.top_k
+        self._repeat_penalty_txi.value = self._chat_configuration.repeat_penalty
+        self._min_p_txi.value = self._chat_configuration.min_p
+        self._top_p_txi.value = self._chat_configuration.top_p
+
+    def store_ui_to_to_config(self):
+        self._chat_configuration.system_content = self._system_content_mti.value
+        self._chat_configuration.temp = self._temp_txi.value
+        self._chat_configuration.n_predict = self._n_predict_txi.value
+        self._chat_configuration.top_k = self._top_k_txi.value
+        self._chat_configuration.repeat_penalty = self._repeat_penalty_txi.value
+        self._chat_configuration.min_p = self._min_p_txi.value
+        self._chat_configuration.top_p = self._top_p_txi.value
+
+    def __init__(self, chat_configuration : ChatConfiguration, on_ok : (Widget), on_cancel : (Widget)):
+
+        self._chat_configuration = chat_configuration
+        self._external_on_ok = on_ok
+        self._external_on_cancel = on_cancel
         
         # System content
         system_content_lbl = Label("System content")
 
-        self._system_content_mti = MultilineTextInput(value=system_content)
+        self._system_content_mti = MultilineTextInput()
         self._system_content_mti.style.flex=1
 
         system_content_bx = Box(children=[system_content_lbl, self._system_content_mti])
@@ -36,11 +58,7 @@ class ChatConfigurationBox(Box):
         # Temp
         temp_lbl = Label("Temperature")
         temp_lbl.style.width = ChatConfigurationBox.LABEL_WIDTH
-
-        self._temp_txi = TextInput(
-            value=temp, 
-            validators=[Number(error_message="must be a number", allow_empty=False),
-                        FloatRange("must be in the range [0,1]", allow_empty=False, min=0.0, max=1.0)])
+        self._temp_txi = TextInput(validators=ChatConfiguration.TEMP_VALIDATORS)
         temp_box = Box(children=[temp_lbl, self._temp_txi])
         temp_box.style.direction=ROW
         temp_box.style.alignment="center"
@@ -48,11 +66,7 @@ class ChatConfigurationBox(Box):
         # n_predict
         n_predict_lbl = Label("n_predict")
         n_predict_lbl.style.width = ChatConfigurationBox.LABEL_WIDTH
-
-        self._n_predict_txi = TextInput(
-            value=n_predict,
-            validators=[Number(error_message="must be a number", allow_empty=False),
-                        IntegerRange(error_message="must be an integer greater than -1", allow_empty=False, min=-1)])
+        self._n_predict_txi = TextInput(validators=ChatConfiguration.N_PREDICT_VALIDATORS)
         n_predict_box = Box(children=[n_predict_lbl, self._n_predict_txi])
         n_predict_box.style.direction=ROW
         n_predict_box.style.alignment="center"
@@ -60,11 +74,7 @@ class ChatConfigurationBox(Box):
         # top_k
         top_k_lbl = Label("top_k")
         top_k_lbl.style.width = ChatConfigurationBox.LABEL_WIDTH
-
-        self._top_k_txi = TextInput(
-            value=top_k,
-            validators=[Number(error_message="must be a number", allow_empty=False),
-                        IntegerRange(error_message="must be an integer greater than 0", allow_empty=False, min=0)])
+        self._top_k_txi = TextInput(validators=ChatConfiguration.TOP_K_VALIDATORS)
         top_k_box = Box(children=[top_k_lbl, self._top_k_txi])
         top_k_box.style.direction=ROW
         top_k_box.style.alignment="center"
@@ -72,12 +82,7 @@ class ChatConfigurationBox(Box):
         # Repeat penalty
         repeat_penalty_lbl = Label("Repeat penalty")
         repeat_penalty_lbl.style.width = ChatConfigurationBox.LABEL_WIDTH
-
-        self._repeat_penalty_txi = TextInput(
-            value = repeat_penalty,
-            validators=[Number(error_message="must be a number", allow_empty=False),
-                        FloatRange(error_message="must be greater than or equal to 0", allow_empty=False, min=0.0)])
-        
+        self._repeat_penalty_txi = TextInput(validators=ChatConfiguration.REPEAT_PENALTY_VALIDATORS)        
         repeat_penalty_box = Box(children=[repeat_penalty_lbl, self._repeat_penalty_txi])
         repeat_penalty_box.style.direction = ROW
         repeat_penalty_box.style.alignment="center"
@@ -85,12 +90,7 @@ class ChatConfigurationBox(Box):
         # min_p
         min_p_lbl = Label("min_p")
         min_p_lbl.style.width = ChatConfigurationBox.LABEL_WIDTH
-
-        self._min_p_txi = TextInput(
-            value = min_p,
-            validators=[Number(error_message="must be a number", allow_empty=False),
-                        FloatRange(error_message="must be in the range [0,1]", allow_empty=False, min=0, max=1)])
-        
+        self._min_p_txi = TextInput(validators=ChatConfiguration.MIN_P_VALIDATORS)        
         min_p_bx = Box(children=[min_p_lbl, self._min_p_txi])
         min_p_bx.style.direction=ROW
         min_p_bx.style.alignment="center"
@@ -98,12 +98,7 @@ class ChatConfigurationBox(Box):
         # top_p
         top_p_lbl = Label("top_p")
         top_p_lbl.style.width = ChatConfigurationBox.LABEL_WIDTH
-
-        self._top_p_txi = TextInput(
-            value = top_p,
-            validators=[Number(error_message="must be a number", allow_empty=False),
-                        FloatRange(error_message="must be in the range [0,1]", allow_empty=False, min=0, max=1)])
-        
+        self._top_p_txi = TextInput(validators=ChatConfiguration.TOP_P_VALIDATORS)        
         top_p_box = Box(children=[top_p_lbl, self._top_p_txi])
         top_p_box.style.direction = ROW
         top_p_box.style.alignment="center"
@@ -117,6 +112,8 @@ class ChatConfigurationBox(Box):
         super(ChatConfigurationBox, self).__init__(
             children=[system_content_bx, temp_box, n_predict_box, top_k_box, repeat_penalty_box, min_p_bx, top_p_box, button_box])
         self.style.direction=COLUMN
+
+        self.load_ui_from_config()
 
     @property
     def system_content(self) -> str:
@@ -134,8 +131,6 @@ class ChatConfigurationBox(Box):
     @property
     def temp(self) -> float:
         """The temperature (randomness) parameter, default=0.8
-
-        Note that temporary value is trimmed.
 
         Returns:
             float: The temperature, range [0,1]

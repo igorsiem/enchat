@@ -2,6 +2,7 @@ import logging
 import toga
 from toga.style.pack import COLUMN, ROW, Pack
 from enchat.message_box import MessageBox
+from enchat.chat_configuration import ChatConfiguration
 from enchat.chat_configuration_box import ChatConfigurationBox
 from enchat.system_configuration_box import SystemConfigurationBox
 from enchat.system_configuration import SystemConfiguration
@@ -67,10 +68,12 @@ class EnChat(toga.App):
         )
 
         self.build_main_content_box()
+        
         self._chat_configuration_box = ChatConfigurationBox(
-                system_content="This is where the system content goes",
+                chat_configuration=ChatConfiguration(),
                 on_ok=self.on_chat_configuration_ok,
                 on_cancel=self.on_chat_configuration_cancel)
+        
         self._system_configuration_box = SystemConfigurationBox(SystemConfiguration(self.paths.config),
                                                                 on_ok=self.on_system_configuration_ok,
                                                                 on_cancel=self.on_system_configuration_cancel)

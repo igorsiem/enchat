@@ -64,7 +64,6 @@ class SystemConfigurationBox(Box):
         """Load the system config from the config file AND the UI controls from the server config object
         """
         self.system_configuration.load()
-        logging.debug(f"SystemConfigurationBox.load called - server address: {self.system_configuration.server_address}")
         self._server_address_txi.value = self.system_configuration.server_address
 
     def store_ui_to_config(self):
