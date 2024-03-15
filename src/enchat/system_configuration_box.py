@@ -1,7 +1,6 @@
 from toga import Box, Label, TextInput, Widget, Button
 from toga.style.pack import COLUMN, ROW
 from enchat.system_configuration import SystemConfiguration
-import logging
 
 class SystemConfigurationBox(Box):
     """A box containing UI controls for configuring the system
