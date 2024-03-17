@@ -1,8 +1,9 @@
 import toga
-from toga import Box, Label, MultilineTextInput, TextInput, Widget, Button
+from toga import Box, Label, MultilineTextInput, TextInput, Widget, Button, Selection
 from toga.style.pack import COLUMN, ROW
 from toga.validators import Number
 from enchat.chat_configuration import ChatConfiguration
+from pathlib import Path
 
 class ChatConfigurationBox(Box):
     """A box containing controls for configuring the current chat
@@ -10,6 +11,9 @@ class ChatConfigurationBox(Box):
     These parameters are sent to the server.
 
     Attributes:
+        _load_filename_sel
+        _save_filename_txi
+        _save_btn
         _system_content_mti (MultiLineTextInput): Input for the system content at the beginning of the chat
         _temp_txi (TextInput): Input for the temperature attribute
         _n_predict_txi (TextInput): Input for the `n_predict` parameter
@@ -40,12 +44,32 @@ class ChatConfigurationBox(Box):
         self.chat_configuration.min_p = self._min_p_txi.value
         self.chat_configuration.top_p = self._top_p_txi.value
 
-    def __init__(self, chat_configuration : ChatConfiguration, on_ok : (Widget), on_cancel : (Widget)):        
+    def __init__(self, chat_configuration : ChatConfiguration, on_ok : (Widget), on_cancel : (Widget), data_dir_path : Path):
 
         self.chat_configuration = chat_configuration
 
         self._external_on_ok = on_ok
         self._external_on_cancel = on_cancel
+        self._data_dir_path = data_dir_path
+
+        # Top control bar
+        new_btn = Button("New", on_press=self.on_new_btn_pressed)
+
+        self._load_filename_sel = Selection()
+        load_btn = Button("Load")
+        load_box = Box(children=[self._load_filename_sel, load_btn])
+        load_box.style.direction=COLUMN
+
+        self._save_filename_txi = TextInput(on_change=self.on_save_filename_changed)
+        self._save_btn = Button("Save", on_press=self.on_save_btn_pressed)
+        save_box = Box(children=[self._save_filename_txi, self._save_btn])
+        save_box.style.direction=COLUMN
+        self.on_save_filename_changed(None)
+
+        control_bar_box = Box(children=[new_btn,
+                                       load_box,
+                                       save_box])
+        control_bar_box.style.direction = ROW
         
         # System content
         system_content_lbl = Label("System content")
@@ -111,7 +135,8 @@ class ChatConfigurationBox(Box):
         button_box.style.direction=(ROW)
 
         super(ChatConfigurationBox, self).__init__(
-            children=[system_content_bx,
+            children=[control_bar_box,
+                      system_content_bx,
                       temp_box,
                       n_predict_box,
                       top_k_box,
@@ -123,93 +148,22 @@ class ChatConfigurationBox(Box):
 
         self.load_ui_from_config()
 
-####    @property
-####    def system_content(self) -> str:
-####        """The system content for starting the chat
-####
-####        Returns:
-####            str: The string used for the system content at the beginning of the chat
-####        """
-####        return self._system_content_mti.value
-####    
-####    @system_content.setter
-####    def system_content(self, value : str):
-####        self._system_content_mti.value = value
-####
-####    @property
-####    def temp(self) -> float:
-####        """The temperature (randomness) parameter, default=0.8
-####
-####        Returns:
-####            float: The temperature, range [0,1]
-####        """
-####        return float(self._temp_txi.value)
-####    
-####    @temp.setter
-####    def temp(self, value : float):
-####        self._temp_txi.value = str(value)
-####
-####    @property
-####    def n_predict(self) -> int:
-####        """ The number of tokens to generate; set to -1 (default) to let the model stop on its own
-####
-####        Returns:
-####            int [-1,]: The `n_predict` parameter for the model
-####        """
-####        return int(float(self._n_predict_txi.value))
-####
-####    @n_predict.setter
-####    def n_predict(self, value : int):
-####        self._n_predict_txi.value = value
-####
-####    @property
-####    def top_k(self) -> int:
-####        """ Top-k sampling parameter; higher values generate more diverse text, default=40
-####
-####        Returns:
-####            int [0,]: The top_k value for the model
-####        """
-####        return int(float(self._top_k_txi.value))
-####    
-####    @top_k.setter
-####    def top_k(self, value : int):
-####        self._top_k_txi.value = value
-####
-####    @property
-####    def repeat_penalty(self) -> float:
-####        """Penalty for repetition; higher value means less probability of repeats, default=1.1
-####
-####        Returns:
-####            float [0,]: The repeat penalty parameter for the model
-####        """
-####        return float(self._repeat_penalty_txi.value)
-####    
-####    @repeat_penalty.setter
-####    def repeat_penalty(self, value : float):
-####        self._repeat_penalty_txi.value = value
-####    
-####    @property
-####    def min_p(self) -> float:
-####        """Minimum probability for token to be considered; default=0.05
-####
-####        Returns:
-####            float [0,1]: The min_p parameter for the model
-####        """
-####        return float(self._min_p_txi.value)
-####    
-####    @min_p.setter
-####    def min_p(self, value : float):
-####        self._min_p_txi.value = value
-####    
-####    @property
-####    def top_p(self) -> float:
-####        """Top-p sampling parameter; balancing number and diversity of tokens; default=0.95
-####
-####        Returns:
-####            float [0,1]: The top_p parameter for the model
-####        """
-####        return float(self._top_p_txi.value)
-####    
-####    @top_p.setter
-####    def top_p(self, value : float):
-####        self._top_p_txi.value = value
+    def on_new_btn_pressed(self, widget):
+        self.chat_configuration = ChatConfiguration()
+        self.load_ui_from_config()
+
+    def on_save_filename_changed(self, widget):
+        if self._save_filename_txi.value == "":
+            self._save_btn.enabled = False
+        else:
+            self._save_btn.enabled = True
+            
+    def on_save_btn_pressed(self, widget):
+        if self._save_filename_txi.value == "":
+            raise RuntimeError("filename not specified")
+        
+        file_path = (self._data_dir_path / self._save_filename_txi.value).with_suffix(ChatConfiguration.FILE_EXTENSION)        
+        
+        self.chat_configuration.write_to_file(file_path)
+
+        self._load_filename_sel.items.append(self._save_filename_txi.value)

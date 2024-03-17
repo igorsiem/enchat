@@ -2,6 +2,7 @@ from toga.validators import Number
 from enchat.validators import FloatRange, IntegerRange, validate_all_using
 from pathlib import Path
 import json
+import logging
 
 class ChatConfiguration:
     """Configuration items for a chat
@@ -73,7 +74,7 @@ class ChatConfiguration:
         self.min_p = min_p
         self.top_p = top_p
 
-        self._path : Path = path
+        self.path : Path = path
 
     @property
     def system_content(self) -> str:
@@ -187,9 +188,9 @@ class ChatConfiguration:
     def write_to_file(self, path : Path = None):
 
         if path is not None:
-            self._path = path
+            self.path = path
 
-        if self._path is None:
+        if self.path is None:
             raise RuntimeError("attempt to write chat configuration to file with no path specified")
         
         data = {
@@ -202,19 +203,22 @@ class ChatConfiguration:
             ChatConfiguration.TOP_P_TAGNAME: self.top_p
         }
 
-        with open(self._path, 'w') as f:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(self.path, 'w') as f:
             json.dump(data, f)
             f.close()
+
+        logging.info(f"write chat config to file: {self.path}")
 
     def read_from_file(self, path : Path = None):
 
         if path is not None:
-            self._path = path
+            self.path = path
 
-        if self._path is None:
+        if self.path is None:
             raise RuntimeError("attempt to read chat configuration from file with no path specified")
         
-        with open(self._path, 'r') as f:
+        with open(self.path, 'r') as f:
             data : dict = json.load(f)
             f.close()
 

@@ -72,7 +72,8 @@ class EnChat(toga.App):
         self._chat_configuration_box = ChatConfigurationBox(
                 chat_configuration=ChatConfiguration(),
                 on_ok=self.on_chat_configuration_ok,
-                on_cancel=self.on_chat_configuration_cancel)
+                on_cancel=self.on_chat_configuration_cancel,
+                data_dir_path=self.paths.data)
         
         self._system_configuration_box = SystemConfigurationBox(SystemConfiguration(self.paths.config),
                                                                 on_ok=self.on_system_configuration_ok,
