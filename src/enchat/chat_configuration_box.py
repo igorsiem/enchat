@@ -27,6 +27,8 @@ class ChatConfigurationBox(Box):
     LABEL_WIDTH = 100
 
     def load_ui_from_config(self):
+        """Load user interface elements from the config object
+        """
         self._system_content_mti.value = self.chat_configuration.system_content
         self._temp_txi.value = self.chat_configuration.temp
         self._n_predict_txi.value = self.chat_configuration.n_predict
@@ -36,6 +38,8 @@ class ChatConfigurationBox(Box):
         self._top_p_txi.value = self.chat_configuration.top_p
 
     def store_ui_to_to_config(self):
+        """Store values from the user interface elements into the config objects
+        """
         self.chat_configuration.system_content = self._system_content_mti.value
         self.chat_configuration.temp = self._temp_txi.value
         self.chat_configuration.n_predict = self._n_predict_txi.value
@@ -56,7 +60,8 @@ class ChatConfigurationBox(Box):
         new_btn = Button("New", on_press=self.on_new_btn_pressed)
 
         self._load_filename_sel = Selection()
-        load_btn = Button("Load")
+        self.populate_chat_configs()
+        load_btn = Button("Load", on_press=self.on_load_btn_pressed)
         load_box = Box(children=[self._load_filename_sel, load_btn])
         load_box.style.direction=COLUMN
 
@@ -148,22 +153,59 @@ class ChatConfigurationBox(Box):
 
         self.load_ui_from_config()
 
-    def on_new_btn_pressed(self, widget):
+    def on_new_btn_pressed(self, widget : Widget):
+        """When the "New" button is pressed, create a new configuration object (with default values) and load it into the user interface
+
+        Args:
+            widget (Widget): The widget that invoked the operation
+        """
         self.chat_configuration = ChatConfiguration()
         self.load_ui_from_config()
 
-    def on_save_filename_changed(self, widget):
+    def on_save_filename_changed(self, widget : Widget):
+        """When the 'save' filename changes, ensure that UI elements (such as "Save" button enablement) is consistent
+
+        The user cannot save a chat config to a file with a blank filename.
+
+        Args:
+            widget (Widget): The widget that invoked the operation
+        """
         if self._save_filename_txi.value == "":
             self._save_btn.enabled = False
         else:
             self._save_btn.enabled = True
             
-    def on_save_btn_pressed(self, widget):
+    def on_save_btn_pressed(self, widget : Widget):
+        """Save the chat config to a file when the "Save" button is pressed
+
+        Args:
+            widget (Widget): The widget that invoked the operation
+
+        Raises:
+            RuntimeError: A filename was not specified
+        """
         if self._save_filename_txi.value == "":
             raise RuntimeError("filename not specified")
         
         file_path = (self._data_dir_path / self._save_filename_txi.value).with_suffix(ChatConfiguration.FILE_EXTENSION)        
         
+        self.store_ui_to_to_config()
         self.chat_configuration.write_to_file(file_path)
 
-        self._load_filename_sel.items.append(self._save_filename_txi.value)
+        self.populate_chat_configs()
+
+    def on_load_btn_pressed(self, widget : Widget):
+        if self._load_filename_sel.value == "":
+            raise RuntimeError("filename not specified")
+        
+        file_path = (self._data_dir_path / self._load_filename_sel.value).with_suffix(ChatConfiguration.FILE_EXTENSION)
+
+        self.chat_configuration.read_from_file(file_path)
+
+        self.load_ui_from_config()
+
+    def populate_chat_configs(self):
+        self._load_filename_sel.items.clear()
+
+        for fn in ChatConfiguration.available_filenames(self._data_dir_path):
+            self._load_filename_sel.items.append(fn.stem)

@@ -60,7 +60,7 @@ class ChatConfiguration:
                         FloatRange(error_message="must be in the range [0,1]", allow_empty=False, min=TOP_P_MIN, max=TOP_P_MAX)]
     TOP_P_TAGNAME = 'top_p'
 
-    FILE_EXTENSION = ".chatconfig.json"
+    FILE_EXTENSION = ".chatconfig"
 
     def __init__(self, system_content : str = SYSTEM_CONTENT_DEFAULT, temp : float = TEMP_DEFAULT, n_predict : int = N_PREDICT_DEFAULT,
                  top_k : int = TOP_K_DEFAULT, repeat_penalty : float = REPEAT_PENALTY_DEFAULT, min_p : float = MIN_P_DEFAULT,
@@ -258,5 +258,5 @@ class ChatConfiguration:
                 self.top_p = ChatConfiguration.TOP_P_DEFAULT
 
     @classmethod
-    def available_filenames(cls, data_dir_path : Path) -> list:
+    def available_filenames(cls, data_dir_path : Path) -> list[Path]:
         return data_dir_path.glob('*' + cls.FILE_EXTENSION)
