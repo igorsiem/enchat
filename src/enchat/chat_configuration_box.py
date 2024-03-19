@@ -48,12 +48,9 @@ class ChatConfigurationBox(Box):
         self.chat_configuration.min_p = self._min_p_txi.value
         self.chat_configuration.top_p = self._top_p_txi.value
 
-    def __init__(self, chat_configuration : ChatConfiguration, on_ok : (Widget), on_cancel : (Widget), data_dir_path : Path):
+    def __init__(self, chat_configuration : ChatConfiguration, on_close : (Widget), data_dir_path : Path):
 
         self.chat_configuration = chat_configuration
-
-        self._external_on_ok = on_ok
-        self._external_on_cancel = on_cancel
         self._data_dir_path = data_dir_path
 
         # Top control bar
@@ -132,11 +129,9 @@ class ChatConfigurationBox(Box):
         top_p_box = Box(children=[top_p_lbl, self._top_p_txi])
         top_p_box.style.direction = ROW
         top_p_box.style.alignment="center"
-
-        # OK and cancel buttons
-        ok_btn = Button(text="OK", on_press=on_ok)
-        cancel_btn = Button(text="Cancel", on_press=on_cancel)
-        button_box = Box(children=[ok_btn, cancel_btn])
+        
+        # Button box with single close button
+        button_box = Box(children=[Button(text="Close", on_press=on_close)])
         button_box.style.direction=(ROW)
 
         super(ChatConfigurationBox, self).__init__(
@@ -193,6 +188,7 @@ class ChatConfigurationBox(Box):
         self.chat_configuration.write_to_file(file_path)
 
         self.populate_chat_configs()
+        self._load_filename_sel.value = self.chat_configuration.path.stem
 
     def on_load_btn_pressed(self, widget : Widget):
         if self._load_filename_sel.value == "":
@@ -203,6 +199,7 @@ class ChatConfigurationBox(Box):
         self.chat_configuration.read_from_file(file_path)
 
         self.load_ui_from_config()
+        self._save_filename_txi.value = file_path.stem
 
     def populate_chat_configs(self):
         self._load_filename_sel.items.clear()

@@ -44,7 +44,7 @@ class SystemConfigurationBox(Box):
     def on_ok(self, widget : Widget):
         """Update the managed System Configuration object when OK is pressed, and write it to a file
 
-        Note that the `self._external_on_ok` function (passed to the `__init__` method is called after the update).
+        Note that the `self._external_on_ok` function (passed to the `__init__` method) is called after the update.
 
         Args:
             widget (Widget): The widget that triggered the call

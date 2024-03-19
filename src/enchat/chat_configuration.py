@@ -15,7 +15,7 @@ class ChatConfiguration:
         TEMP_MAX (float): The maximum value for the temp (randomness) parameter
         TEMP_DEFAULT (float): The default value for the tmep (randomness) parameter
 
-        _path (Path or None): The path to the file in which the chat configuration has been saved
+        path (Path or None): The path to the file in which the chat configuration has been saved
     """
 
     SYSTEM_CONTENT_DEFAULT = "You are an AI assistant."

@@ -71,8 +71,7 @@ class EnChat(toga.App):
         
         self._chat_configuration_box = ChatConfigurationBox(
                 chat_configuration=ChatConfiguration(),
-                on_ok=self.on_chat_configuration_ok,
-                on_cancel=self.on_chat_configuration_cancel,
+                on_close=self.on_chat_configuration_close,
                 data_dir_path=self.paths.data)
         
         self._system_configuration_box = SystemConfigurationBox(SystemConfiguration(self.paths.config),
@@ -139,30 +138,9 @@ class EnChat(toga.App):
         """
         self.switch_to_chat_configuration()
         logging.debug("TODO Implement chat configuration initialisation")
-
-    def on_chat_configuration_ok(self, widget):
-        """Update the configuration for the chat and hide the Chat Configuration window.
-
-        This method is called when the User presses the OK button to confirm the data in the Chat Configuration window.
-
-        TODO Implement chat configuration confirmation
-
-        Args:
-            widget (Widget): The widget that invoked this method
-        """
+        
+    def on_chat_configuration_close(self, widget : toga.Widget):
         self.switch_to_main_content()
-        logging.debug("TODO Implement chat configuration")
-
-    def on_chat_configuration_cancel(self, widget):
-        """Close the Chat Configuration window without updating any chat parameters.
-
-        TODO implement chat config cancellation
-
-        Args:
-            widget (Widget): The widget that invoked this method
-        """
-        self.switch_to_main_content()        
-        logging.debug("TODO implement chat config cancel")
 
     def configure_system(self, widget : toga.Widget):
         """Allow the user to configure the system by switching to the system configuration UI        
