@@ -4,6 +4,7 @@ from toga.style.pack import COLUMN, ROW
 from toga.validators import Number
 from enchat.chat_configuration import ChatConfiguration
 from pathlib import Path
+import logging
 
 class ChatConfigurationBox(Box):
     """A box containing controls for configuring the current chat
@@ -11,9 +12,10 @@ class ChatConfigurationBox(Box):
     These parameters are sent to the server.
 
     Attributes:
-        _load_filename_sel
-        _save_filename_txi
-        _save_btn
+        _load_filename_sel (Selection): Selector for choosing existing config file
+        _load_btn
+        _save_filename_txi (TextInput): Edit box for setting save filename
+        _save_btn (Button): Button for saving config file
         _system_content_mti (MultiLineTextInput): Input for the system content at the beginning of the chat
         _temp_txi (TextInput): Input for the temperature attribute
         _n_predict_txi (TextInput): Input for the `n_predict` parameter
@@ -29,6 +31,11 @@ class ChatConfigurationBox(Box):
     def load_ui_from_config(self):
         """Load user interface elements from the config object
         """
+####        if self.chat_configuration.path is None:
+####            self._load_filename_sel.value = ""
+####        else:
+####            self._load_filename_sel.value = self.chat_configuration.path.stem
+
         self._system_content_mti.value = self.chat_configuration.system_content
         self._temp_txi.value = self.chat_configuration.temp
         self._n_predict_txi.value = self.chat_configuration.n_predict
@@ -51,26 +58,33 @@ class ChatConfigurationBox(Box):
     def __init__(self, chat_configuration : ChatConfiguration, on_close : (Widget), data_dir_path : Path):
 
         self.chat_configuration = chat_configuration
+        self._external_on_close = on_close
         self._data_dir_path = data_dir_path
 
-        # Top control bar
+        # Control bar
+####        dummy_box = Box()
+####        dummy_box.style.width = 75
         new_btn = Button("New", on_press=self.on_new_btn_pressed)
+####        new_btn.style.width = 75
 
-        self._load_filename_sel = Selection()
+        self._load_filename_sel = Selection(on_change=self.on_load_filename_sel_changed)
+####        self._load_filename_sel.style.width = 150
         self.populate_chat_configs()
-        load_btn = Button("Load", on_press=self.on_load_btn_pressed)
-        load_box = Box(children=[self._load_filename_sel, load_btn])
-        load_box.style.direction=COLUMN
+########        self._load_btn = Button("Load", on_press=self.on_load_btn_pressed)
+########        self._load_btn.style.width = 150
+####
+####        self._save_filename_txi = TextInput(on_change=self.on_save_filename_changed)
+####        self._save_filename_txi.style.width = 150
+####        self._save_btn = Button("Save", on_press=self.on_save_btn_pressed)
+####        self._save_btn.style.width = 150
+####
+####        self.on_save_filename_changed(None)
+####        top_box = Box(children=[dummy_box, self._load_filename_sel, self._save_filename_txi])
+####        top_box.style.direction = ROW
+####        bottom_box = Box(children=[new_btn, self._save_btn])
+####        bottom_box.style.direction = ROW
 
-        self._save_filename_txi = TextInput(on_change=self.on_save_filename_changed)
-        self._save_btn = Button("Save", on_press=self.on_save_btn_pressed)
-        save_box = Box(children=[self._save_filename_txi, self._save_btn])
-        save_box.style.direction=COLUMN
-        self.on_save_filename_changed(None)
-
-        control_bar_box = Box(children=[new_btn,
-                                       load_box,
-                                       save_box])
+        control_bar_box = Box(children=[new_btn, self._load_filename_sel])
         control_bar_box.style.direction = ROW
         
         # System content
@@ -131,11 +145,11 @@ class ChatConfigurationBox(Box):
         top_p_box.style.alignment="center"
         
         # Button box with single close button
-        button_box = Box(children=[Button(text="Close", on_press=on_close)])
+        button_box = Box(children=[Button(text="Close", on_press=self.on_close_btn_pressed)])
         button_box.style.direction=(ROW)
 
         super(ChatConfigurationBox, self).__init__(
-            children=[control_bar_box,
+            children=[ control_bar_box,
                       system_content_bx,
                       temp_box,
                       n_predict_box,
@@ -149,60 +163,64 @@ class ChatConfigurationBox(Box):
         self.load_ui_from_config()
 
     def on_new_btn_pressed(self, widget : Widget):
-        """When the "New" button is pressed, create a new configuration object (with default values) and load it into the user interface
-
-        Args:
-            widget (Widget): The widget that invoked the operation
-        """
         self.chat_configuration = ChatConfiguration()
         self.load_ui_from_config()
+        self._load_filename_sel.value = ""
 
-    def on_save_filename_changed(self, widget : Widget):
-        """When the 'save' filename changes, ensure that UI elements (such as "Save" button enablement) is consistent
-
-        The user cannot save a chat config to a file with a blank filename.
-
-        Args:
-            widget (Widget): The widget that invoked the operation
-        """
-        if self._save_filename_txi.value == "":
-            self._save_btn.enabled = False
-        else:
-            self._save_btn.enabled = True
+####    def on_save_filename_changed(self, widget : Widget):
+####        """When the 'save' filename changes, ensure that UI elements (such as "Save" button enablement) is consistent
+####
+####        The user cannot save a chat config to a file with a blank filename.
+####
+####        Args:
+####            widget (Widget): The widget that invoked the operation
+####        """
+####        if self._save_filename_txi.value == "":
+####            self._save_btn.enabled = False
+####        else:
+####            self._save_btn.enabled = True
             
-    def on_save_btn_pressed(self, widget : Widget):
-        """Save the chat config to a file when the "Save" button is pressed
+####    def on_save_btn_pressed(self, widget : Widget):
+####        """Save the chat config to a file when the "Save" button is pressed
+####
+####        Args:
+####            widget (Widget): The widget that invoked the operation
+####
+####        Raises:
+####            RuntimeError: A filename was not specified
+####        """
+####        if self._save_filename_txi.value == "":
+####            raise RuntimeError("filename not specified")
+####        
+####        file_path = (self._data_dir_path / self._save_filename_txi.value).with_suffix(ChatConfiguration.FILE_EXTENSION)        
+####        
+####        self.store_ui_to_to_config()
+####        self.chat_configuration.write_to_file(file_path)
+####
+####        self.populate_chat_configs()
+####        self._load_filename_sel.value = self.chat_configuration.path.stem
 
-        Args:
-            widget (Widget): The widget that invoked the operation
+####    def on_load__btn_pressed(self, widget : Widget):
+    def on_load_filename_sel_changed(self, widget : Widget):
 
-        Raises:
-            RuntimeError: A filename was not specified
-        """
-        if self._save_filename_txi.value == "":
-            raise RuntimeError("filename not specified")
-        
-        file_path = (self._data_dir_path / self._save_filename_txi.value).with_suffix(ChatConfiguration.FILE_EXTENSION)        
-        
-        self.store_ui_to_to_config()
-        self.chat_configuration.write_to_file(file_path)
-
-        self.populate_chat_configs()
-        self._load_filename_sel.value = self.chat_configuration.path.stem
-
-    def on_load_btn_pressed(self, widget : Widget):
-        if self._load_filename_sel.value == "":
-            raise RuntimeError("filename not specified")
-        
-        file_path = (self._data_dir_path / self._load_filename_sel.value).with_suffix(ChatConfiguration.FILE_EXTENSION)
-
-        self.chat_configuration.read_from_file(file_path)
-
-        self.load_ui_from_config()
-        self._save_filename_txi.value = file_path.stem
+        if self._load_filename_sel.value != "":
+            file_path = (self._data_dir_path / self._load_filename_sel.value).with_suffix(ChatConfiguration.FILE_EXTENSION)
+            self.chat_configuration.read_from_file(file_path)
+            self.load_ui_from_config()
+            logging.debug(f"loaded file {file_path}")
+####            self._save_filename_txi.value = file_path.stem
+            
+    def on_configuration_changed(self, widget : Widget):
+        pass
 
     def populate_chat_configs(self):
-        self._load_filename_sel.items.clear()
+        """Populate the chat configs selector with available chat config files
+        """
+        self._load_filename_sel.items = [""]
 
         for fn in ChatConfiguration.available_filenames(self._data_dir_path):
             self._load_filename_sel.items.append(fn.stem)
+
+    def on_close_btn_pressed(self, widget : Widget):
+        self.store_ui_to_to_config()
+        self._external_on_close(widget)
